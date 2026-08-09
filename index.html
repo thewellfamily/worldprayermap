@@ -72,6 +72,14 @@
   .prayer-points li{display:flex;gap:8px;font-size:.88rem;line-height:1.45;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
   .pinned-points li{display:flex;gap:7px;font-size:.82rem;line-height:1.4;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
   .pinned-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:var(--panel-text);}
+  body.map-only-mode header{padding:16px 36px 12px;}
+  body.map-only-mode .header-left p,
+  body.map-only-mode .side-panel,
+  body.map-only-mode .floating-actions,
+  body.map-only-mode .continent-badge,
+  body.map-only-mode .instructions{display:none !important;}
+  body.map-only-mode .layout{display:block;position:relative;flex:1;}
+  body.map-only-mode .map-container{width:100%;height:100%;}
   /* Magnifier */
   .magnifier{position:absolute;pointer-events:none;display:none;z-index:10;}
   .magnifier-circle{width:260px;height:260px;border-radius:50%;border:2px solid rgba(140,200,255,.65);box-shadow:0 0 0 1px rgba(100,180,255,.1),0 12px 60px rgba(0,0,0,.65);overflow:hidden;position:relative;background:#0d2c54;}
@@ -226,6 +234,7 @@
   .mag-toggle.active{color:var(--gold);border-color:rgba(200,169,81,0.68);background:rgba(200,169,81,0.16);}
   .mag-toggle.active .mag-toggle-track{background:rgba(200,169,81,.55);border-color:rgba(200,169,81,.9);}
   .mag-toggle.active .mag-toggle-thumb{left:16px;background:#ffe6a3;}
+  .map-only-toggle{justify-content:space-between;width:100%;height:32px;padding:0 9px;}
   .map-container.continent-mode #worldMap .country.out-of-continent{opacity:.12;fill:#25425f;stroke:rgba(120,180,255,.12);}
   .map-container.continent-mode #worldMap .country.in-continent{opacity:1;}
   .map-container.continent-mode #worldMap .country.territory-hidden{display:none;}
@@ -392,6 +401,14 @@
         <button class="pos-btn aspect-btn" onclick="setAspectRatio('4:5', this)">4:5</button>
       </div>
       <p class="settings-hint">Choose the shape you are designing for before editing country info or exporting.</p>
+    </div>
+    <div class="settings-row">
+      <label class="settings-label">Clean Export <span id="mapOnlyLabel">Off</span></label>
+      <button class="mag-toggle map-only-toggle" id="mapOnlyToggleBtn" onclick="toggleMapOnlyMode()" title="Toggle clean map-only mode">
+        <span id="mapOnlyToggleText">Map Only</span>
+        <span class="mag-toggle-track"><span class="mag-toggle-thumb"></span></span>
+      </button>
+      <p class="settings-hint">Shows only the title, map, selected country, and magnifier for clean graphics.</p>
     </div>
 
     <div class="settings-divider"></div>
@@ -998,6 +1015,7 @@ let magConeTipOffsetX = 0;
 let magConeTipOffsetY = 0;
 let uiScale = 1.0;
 let designAspect = '16:9';
+let mapOnlyMode = false;
 const ASPECT_PRESETS = {
   '16:9': { w:1920, h:1080, panel:420 },
   '21:9': { w:1792, h:768, panel:450 },
@@ -2374,6 +2392,33 @@ function setAspectRatio(value) {
   applyDesignAspect(value);
 }
 
+function applyMapOnlyMode(enabled, persist = true) {
+  mapOnlyMode = !!enabled;
+  document.body.classList.toggle('map-only-mode', mapOnlyMode);
+  const btn = document.getElementById('mapOnlyToggleBtn');
+  const label = document.getElementById('mapOnlyLabel');
+  if (btn) btn.classList.toggle('active', mapOnlyMode);
+  if (label) label.textContent = mapOnlyMode ? 'On' : 'Off';
+  if (persist) {
+    try { localStorage.setItem('houseOfPrayerMapOnlyMode', mapOnlyMode ? '1' : '0'); } catch(e) {}
+  }
+  requestAnimationFrame(() => {
+    applyMapView(getMapViewKey());
+    refreshMagnifier();
+    if (document.getElementById('dlModalOverlay')?.classList.contains('open')) schedulePreview();
+  });
+}
+
+function loadMapOnlyMode() {
+  let saved = null;
+  try { saved = localStorage.getItem('houseOfPrayerMapOnlyMode'); } catch(e) {}
+  applyMapOnlyMode(saved === '1', false);
+}
+
+function toggleMapOnlyMode() {
+  applyMapOnlyMode(!mapOnlyMode);
+}
+
 function onZoomSlider(val) {
   magZoomMultiplier = parseFloat(val);
   document.getElementById('zoomLabel').textContent = magZoomMultiplier.toFixed(2) + '×';
@@ -2428,6 +2473,7 @@ function resetSettings() {
   saveMapViewBoxes();
   applyUiScale(1);
   applyDesignAspect('16:9');
+  applyMapOnlyMode(false);
   document.getElementById('uiScaleSlider').value   = 1.0;
   document.getElementById('zoomSlider').value      = 1.0;
   document.getElementById('sizeSlider').value      = 260;
@@ -2550,6 +2596,7 @@ mapSvg.addEventListener('wheel', onMapWheel, { passive:false });
 // ── COLOR THEME ENGINE ────────────────────────────────────────
 loadUiScale();
 loadDesignAspect();
+loadMapOnlyMode();
 
 function setVar(name, value) {
   root.style.setProperty(name, value);
@@ -2943,10 +2990,28 @@ function buildExportOverrideStyle() {
     html { font-size: ${16 * uiScale}px !important; }
     :root { --ui-scale:${uiScale.toFixed(2)} !important; --panel-width:${getComputedStyle(root).getPropertyValue('--panel-width').trim() || '420px'} !important; }
     header { background: ${headerBg} !important; }
-    .side-panel { background: ${panelBg} !important; opacity:1 !important; position:relative !important; overflow:hidden !important; padding-bottom:calc(var(--export-pinned-height, 185px) + 34px) !important; }
-    .panel-content { background:transparent !important; overflow:hidden !important; max-height:calc(100% - var(--export-pinned-height, 185px) - 34px) !important; }
+    .side-panel { background: ${panelBg} !important; opacity:1 !important; position:relative !important; display:block !important; overflow:hidden !important; padding:0 !important; }
+    .panel-content { background:transparent !important; position:absolute !important; top:24px !important; left:24px !important; right:24px !important; bottom:calc(var(--export-pinned-height, 185px) + 44px) !important; overflow:hidden !important; max-height:none !important; min-height:0 !important; padding-right:0 !important; }
     .panel-empty { background:transparent !important; }
-    .pinned-prayers { background:transparent !important; position:absolute !important; left:24px !important; right:24px !important; bottom:24px !important; margin:0 !important; z-index:5 !important; }
+    .pinned-prayers { background:transparent !important; position:absolute !important; left:24px !important; right:24px !important; bottom:20px !important; margin:0 !important; padding-top:10px !important; z-index:5 !important; }
+    .panel-region { font-size:10px !important; margin-bottom:6px !important; }
+    .panel-flag { font-size:24px !important; margin-bottom:6px !important; }
+    .panel-name { font-size:38px !important; margin-bottom:2px !important; }
+    .panel-pop { font-size:11px !important; margin-bottom:9px !important; }
+    .panel-divider { margin-bottom:8px !important; }
+    .panel-leader-label { margin-bottom:3px !important; padding-top:1px !important; padding-bottom:1px !important; }
+    .panel-leader { font-size:18px !important; margin-bottom:10px !important; }
+    .prayer-heading { font-size:15px !important; margin-bottom:6px !important; padding-bottom:5px !important; }
+    .prayer-points { gap:4px !important; }
+    .prayer-points li { font-size:12px !important; line-height:1.22 !important; gap:7px !important; }
+    .prayer-num { font-size:16px !important; line-height:1.05 !important; }
+    .pinned-card { padding:8px 10px !important; gap:4px !important; }
+    .pinned-card-header { gap:6px !important; }
+    .pinned-flag { font-size:1.05rem !important; }
+    .pinned-name { font-size:.95rem !important; }
+    .pinned-points { gap:3px !important; margin-top:2px !important; }
+    .pinned-points li { font-size:.7rem !important; line-height:1.22 !important; gap:6px !important; }
+    .pinned-num { font-size:.9rem !important; line-height:1.15 !important; }
     .map-container { background: linear-gradient(to bottom, ${oceanTop} 0%, ${oceanBottom} 100%) center center / 100% 135% no-repeat !important; }
     .pinned-card { background: rgba(0,0,0,0.25) !important; border-color:${accent} !important; }
     .panel-divider { background: ${accent} !important; opacity:1 !important; }
@@ -2960,6 +3025,15 @@ function buildExportOverrideStyle() {
     .header-left p { color:#ddeeff !important; opacity:1 !important; }
     .panel-region::before { background:${gold} !important; }
     .no-prayers { color:#c8dff0 !important; opacity:1 !important; }
+    body.map-only-mode header { padding:16px 36px 12px !important; }
+    body.map-only-mode .header-left p,
+    body.map-only-mode .header-actions,
+    body.map-only-mode .side-panel,
+    body.map-only-mode .floating-actions,
+    body.map-only-mode .continent-badge,
+    body.map-only-mode .instructions { display:none !important; }
+    body.map-only-mode .layout { display:block !important; position:relative !important; }
+    body.map-only-mode .map-container { width:100% !important; height:100% !important; }
     span, li, p, div { opacity:1 !important; }
   `;
   return { exportStyle, headerBg };

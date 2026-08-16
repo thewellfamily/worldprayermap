@@ -2983,6 +2983,9 @@ function buildExportOverrideStyle() {
   const oceanBottom = getComputedStyle(root).getPropertyValue('--ocean-bottom').trim() || '#001829';
   const gold      = getComputedStyle(root).getPropertyValue('--gold').trim()        || '#c8a951';
   const accent    = getComputedStyle(root).getPropertyValue('--blue-accent').trim() || '#5ba3e8';
+  const exportPrayerFont = Math.max(11, Math.min(16, 12 * uiScale)).toFixed(1);
+  const exportPrayerNumFont = Math.max(15, Math.min(21, 16 * uiScale)).toFixed(1);
+  const exportPrayerHeadingFont = Math.max(14, Math.min(18, 15 * uiScale)).toFixed(1);
 
   const exportStyle = document.createElement('style');
   exportStyle.id = 'export-override';
@@ -3001,10 +3004,10 @@ function buildExportOverrideStyle() {
     .panel-divider { margin-bottom:8px !important; }
     .panel-leader-label { margin-bottom:3px !important; padding-top:1px !important; padding-bottom:1px !important; }
     .panel-leader { font-size:18px !important; margin-bottom:10px !important; }
-    .prayer-heading { font-size:15px !important; margin-bottom:6px !important; padding-bottom:5px !important; }
+    .prayer-heading { font-size:${exportPrayerHeadingFont}px !important; margin-bottom:6px !important; padding-bottom:5px !important; }
     .prayer-points { gap:4px !important; }
-    .prayer-points li { font-size:12px !important; line-height:1.22 !important; gap:7px !important; }
-    .prayer-num { font-size:16px !important; line-height:1.05 !important; }
+    .prayer-points li { font-size:${exportPrayerFont}px !important; line-height:1.22 !important; gap:7px !important; }
+    .prayer-num { font-size:${exportPrayerNumFont}px !important; line-height:1.05 !important; }
     .pinned-card { padding:8px 10px !important; gap:4px !important; }
     .pinned-card-header { gap:6px !important; }
     .pinned-flag { font-size:1.05rem !important; }

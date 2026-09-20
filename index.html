@@ -27,6 +27,11 @@
     --header-control-h:34px;
     --ui-scale:1;
     --panel-width:420px;
+    --prayer-heading-size:18px;
+    --prayer-point-size:18px;
+    --prayer-number-size:22px;
+    --pinned-point-size:14px;
+    --pinned-number-size:18px;
   }
   html{font-size:calc(16px * var(--ui-scale));}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -68,9 +73,9 @@
   .panel-name{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:.08em;line-height:1;margin-bottom:3px;color:var(--panel-text);}
   .panel-pop{font-size:.76rem;color:var(--panel-text-dim);letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px;}
   .panel-leader{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.1em;margin-bottom:18px;color:var(--panel-text);}
-  .prayer-heading{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.25em;margin-bottom:11px;padding-bottom:6px;border-bottom:1px solid rgba(91,163,232,.35);color:var(--panel-text);}
-  .prayer-points li{display:flex;gap:8px;font-size:.88rem;line-height:1.45;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
-  .pinned-points li{display:flex;gap:7px;font-size:.82rem;line-height:1.4;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
+  .prayer-heading{font-family:'Bebas Neue',sans-serif;font-size:var(--prayer-heading-size);letter-spacing:.25em;margin-bottom:11px;padding-bottom:6px;border-bottom:1px solid rgba(91,163,232,.35);color:var(--panel-text);}
+  .prayer-points li{display:flex;gap:8px;font-size:var(--prayer-point-size);line-height:1.35;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
+  .pinned-points li{display:flex;gap:7px;font-size:var(--pinned-point-size);line-height:1.35;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:var(--panel-text);}
   .pinned-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:var(--panel-text);}
   body.map-only-mode header{padding:16px 36px 12px;}
   body.map-only-mode .header-left p,
@@ -98,10 +103,10 @@
   .panel-divider{height:2px;background:linear-gradient(90deg,var(--blue-accent),transparent);margin-bottom:14px;}
   .panel-leader-label{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:#7bc8f5;background:rgba(37,99,168,.25);border:1px solid rgba(91,163,232,.5);padding:2px 8px;display:inline-block;margin-bottom:4px;font-weight:700;}
   .panel-leader{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.1em;margin-bottom:18px;color:#ffffff;}
-  .prayer-heading{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.25em;margin-bottom:11px;padding-bottom:6px;border-bottom:1px solid rgba(91,163,232,.35);color:#ffffff;}
+  .prayer-heading{font-family:'Bebas Neue',sans-serif;font-size:var(--prayer-heading-size);letter-spacing:.25em;margin-bottom:11px;padding-bottom:6px;border-bottom:1px solid rgba(91,163,232,.35);color:#ffffff;}
   .prayer-points{list-style:none;display:flex;flex-direction:column;gap:7px;}
-  .prayer-points li{display:flex;gap:8px;font-size:.88rem;line-height:1.45;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:#ddeeff;}
-  .prayer-num{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--gold);flex-shrink:0;line-height:1.3;}
+  .prayer-points li{display:flex;gap:8px;font-size:var(--prayer-point-size);line-height:1.35;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:#ddeeff;}
+  .prayer-num{font-family:'Bebas Neue',sans-serif;font-size:var(--prayer-number-size);color:var(--gold);flex-shrink:0;line-height:1.15;}
   .no-prayers{font-size:.74rem;color:#8ab0cc;font-style:italic;letter-spacing:.04em;line-height:1.6;}
   .instructions{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);font-size:.63rem;letter-spacing:.18em;text-transform:uppercase;color:rgba(127,163,200,.35);pointer-events:none;white-space:nowrap;}
   /* Pinned prayer cards at bottom of side panel */
@@ -111,8 +116,8 @@
   .pinned-flag{font-size:1.3rem;line-height:1;flex-shrink:0;}
   .pinned-name{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.1em;color:#ffffff;}
   .pinned-points{list-style:none;display:flex;flex-direction:column;gap:4px;margin-top:3px;}
-  .pinned-points li{display:flex;gap:7px;font-size:.82rem;line-height:1.4;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:#ddeeff;}
-  .pinned-num{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:var(--gold);flex-shrink:0;line-height:1.3;}
+  .pinned-points li{display:flex;gap:7px;font-size:var(--pinned-point-size);line-height:1.35;letter-spacing:.03em;text-transform:uppercase;font-weight:600;color:#ddeeff;}
+  .pinned-num{font-family:'Bebas Neue',sans-serif;font-size:var(--pinned-number-size);color:var(--gold);flex-shrink:0;line-height:1.15;}
   /* Settings panel — slides in from left, no overlay */
   #settingsOverlay{position:fixed;inset:0;background:transparent;z-index:200;display:none;pointer-events:none;}
   #settingsOverlay.open{display:block;pointer-events:all;}
@@ -2330,6 +2335,11 @@ function settingsOverlayClick(e) {
 function applyUiScale(value, persist = true) {
   uiScale = Math.max(0.9, Math.min(1.5, parseFloat(value) || 1));
   root.style.setProperty('--ui-scale', uiScale.toFixed(2));
+  root.style.setProperty('--prayer-heading-size', `${(18 * uiScale).toFixed(1)}px`);
+  root.style.setProperty('--prayer-point-size', `${(18 * uiScale).toFixed(1)}px`);
+  root.style.setProperty('--prayer-number-size', `${(22 * uiScale).toFixed(1)}px`);
+  root.style.setProperty('--pinned-point-size', `${(14 * uiScale).toFixed(1)}px`);
+  root.style.setProperty('--pinned-number-size', `${(18 * uiScale).toFixed(1)}px`);
   updatePanelWidth();
   const slider = document.getElementById('uiScaleSlider');
   const label = document.getElementById('uiScaleLabel');
@@ -2983,9 +2993,12 @@ function buildExportOverrideStyle() {
   const oceanBottom = getComputedStyle(root).getPropertyValue('--ocean-bottom').trim() || '#001829';
   const gold      = getComputedStyle(root).getPropertyValue('--gold').trim()        || '#c8a951';
   const accent    = getComputedStyle(root).getPropertyValue('--blue-accent').trim() || '#5ba3e8';
-  const exportPrayerFont = Math.max(11, Math.min(16, 12 * uiScale)).toFixed(1);
-  const exportPrayerNumFont = Math.max(15, Math.min(21, 16 * uiScale)).toFixed(1);
-  const exportPrayerHeadingFont = Math.max(14, Math.min(18, 15 * uiScale)).toFixed(1);
+  const computedRoot = getComputedStyle(root);
+  const exportPrayerFont = computedRoot.getPropertyValue('--prayer-point-size').trim() || '18px';
+  const exportPrayerNumFont = computedRoot.getPropertyValue('--prayer-number-size').trim() || '22px';
+  const exportPrayerHeadingFont = computedRoot.getPropertyValue('--prayer-heading-size').trim() || '18px';
+  const exportPinnedFont = computedRoot.getPropertyValue('--pinned-point-size').trim() || '14px';
+  const exportPinnedNumFont = computedRoot.getPropertyValue('--pinned-number-size').trim() || '18px';
 
   const exportStyle = document.createElement('style');
   exportStyle.id = 'export-override';
@@ -3004,17 +3017,17 @@ function buildExportOverrideStyle() {
     .panel-divider { margin-bottom:8px !important; }
     .panel-leader-label { margin-bottom:3px !important; padding-top:1px !important; padding-bottom:1px !important; }
     .panel-leader { font-size:18px !important; margin-bottom:10px !important; }
-    .prayer-heading { font-size:${exportPrayerHeadingFont}px !important; margin-bottom:6px !important; padding-bottom:5px !important; }
+    .prayer-heading { font-size:${exportPrayerHeadingFont} !important; margin-bottom:6px !important; padding-bottom:5px !important; }
     .prayer-points { gap:4px !important; }
-    .prayer-points li { font-size:${exportPrayerFont}px !important; line-height:1.22 !important; gap:7px !important; }
-    .prayer-num { font-size:${exportPrayerNumFont}px !important; line-height:1.05 !important; }
+    .prayer-points li { font-size:${exportPrayerFont} !important; line-height:1.28 !important; gap:7px !important; }
+    .prayer-num { font-size:${exportPrayerNumFont} !important; line-height:1.1 !important; }
     .pinned-card { padding:8px 10px !important; gap:4px !important; }
     .pinned-card-header { gap:6px !important; }
     .pinned-flag { font-size:1.05rem !important; }
     .pinned-name { font-size:.95rem !important; }
     .pinned-points { gap:3px !important; margin-top:2px !important; }
-    .pinned-points li { font-size:.7rem !important; line-height:1.22 !important; gap:6px !important; }
-    .pinned-num { font-size:.9rem !important; line-height:1.15 !important; }
+    .pinned-points li { font-size:${exportPinnedFont} !important; line-height:1.28 !important; gap:6px !important; }
+    .pinned-num { font-size:${exportPinnedNumFont} !important; line-height:1.1 !important; }
     .map-container { background: linear-gradient(to bottom, ${oceanTop} 0%, ${oceanBottom} 100%) center center / 100% 135% no-repeat !important; }
     .pinned-card { background: rgba(0,0,0,0.25) !important; border-color:${accent} !important; }
     .panel-divider { background: ${accent} !important; opacity:1 !important; }
